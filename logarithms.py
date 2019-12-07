@@ -44,3 +44,15 @@ def convert_to_base(x, base):
         return result
     f = np.vectorize(_convert_to_base)
     return f(x, base)
+
+# N is the number of desired digits for s. If the number of digits of s is less
+# than N, then this function appends as many '0' in the beginning as needed. If
+# the number of digits of s is more than N, then this function just returns s
+# as it currently is, without any change.
+def sanitize_numeric_string(s, N):
+    def _sanitize_numeric_string(s, N):
+        if len(s) < N:
+            s = (N - len(s)) * "0" + s
+        return s
+    f = np.vectorize(_sanitize_numeric_string)
+    return f(s, N)
