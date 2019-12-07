@@ -11,3 +11,8 @@ def get_log(base):
     y *= base**4
     y = np.round(y)
     return y.astype(int)
+
+def print_table(table, base):
+    for i in range(0, len(table) // base):
+        j = base * i
+        print(table[j : j + base])
