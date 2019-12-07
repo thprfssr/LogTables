@@ -2,7 +2,7 @@
 import numpy as np
 
 def get_log_input(base):
-    x = [i / base**2 for i in range(base**2, base**2)]
+    x = [i / base**2 for i in range(base**2, base**3)]
     return np.array(x)
 
 def get_log(base):
