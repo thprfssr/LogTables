@@ -7,14 +7,13 @@ logarithm_sanitize='logarithm_sanitize.sed'
 function generate_logarithms
 {
 	base=$1
-	tmp=/tmp/$(printf "%x%x" $RANDOM $RANDOM).txt
-	python <<EOF > $tmp
+	str=$(python <<EOF
 from $(basename $logarithms_script .py) import *
 x = get_log($base)
 x = convert_to_base(x, $base)
 x = sanitize_numeric_string(x, 4)
 print_table(x, $base)
 EOF
-	str=$(tr -d "\n" < $tmp) # get rid of all newlines
-	echo $str | sed -f $logarithm_sanitize
+)
+	echo $str | tr -d "\n" | sed -f $logarithm_sanitize
 }
