@@ -71,7 +71,7 @@ function generate_latex_table
 		L=$(echo $logarithms | sed "${i}q;d")
 		I=$(echo $interpolations | sed "${i}q;d")
 		M=$(echo $main | sed "${i}q;d")
-		echo '\t'$M \& $L \& $I '\\\\'
+		echo '\t'\$$M\$ \& $L \& $I '\\\\'
 		if (( $i % $base == 0 )); then
 			echo '\\hline'
 		fi
