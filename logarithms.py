@@ -55,6 +55,10 @@ def print_main_column(base):
     for s in x:
         print(s)
 
+def get_main_row(base):
+    x = [i for i in range(0, base)]
+    return x
+
 # N is the number of desired digits for s. If the number of digits of s is less
 # than N, then this function appends as many '0' in the beginning as needed. If
 # the number of digits of s is more than N, then this function just returns s

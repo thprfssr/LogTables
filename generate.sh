@@ -18,6 +18,9 @@ function generate
 	elif [[ "$mode" == "interpolations" ]]; then
 		func=get_interpolation
 		n=1
+	elif [[ "$mode" == "digits" ]]; then
+		func=get_main_row
+		n=1
 	else
 		echo Unrecognized mode \"$mode\". Exiting...
 		exit -1
@@ -62,10 +65,12 @@ function generate_latex_table
 	echo '\\begin{tabular}'
 	printf '{| c | '
 	printf 'c %.0s' {1..$base}
-	printf '| '
+	printf '|| '
 	printf 'c %.0s' {2..$base}
 	printf "|}\n"
 	echo '\\hline'
+	echo "~ & $(generate digits $base) & $(generate digits $base | cut -d' ' -f3-)" '\\\\'
+	echo "\\hline"
 	for i in {1..$n}; do
 		# get the i-th lines
 		L=$(echo $logarithms | sed "${i}q;d")
@@ -84,7 +89,9 @@ function generate_latex_document
 {
 	base=$1
 	cat <<EOF
-\\documentclass{standalone}
+\\documentclass[border=1pt]{standalone}
+\\usepackage{multirow}
+\\everymath{\\mathtt{\\xdef\\tmp{\\fam\\the\\fam\\relax}\\aftergroup\\tmp}}
 \\begin{document}
 
 $(generate_latex_table $base)
