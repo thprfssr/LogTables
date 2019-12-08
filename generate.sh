@@ -69,6 +69,8 @@ function generate_latex_table
 	printf 'c %.0s' {2..$base}
 	printf "|}\n"
 	echo '\\hline'
+	echo "\\multicolumn{$((2 * $base))}{|c|}{Base $base Logarithms}" '\\\\'
+	echo '\\hline'
 	echo "~ & $(generate digits $base) & $(generate digits $base | cut -d' ' -f3-)" '\\\\'
 	echo "\\hline"
 	for i in {1..$n}; do
