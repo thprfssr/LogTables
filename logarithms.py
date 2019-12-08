@@ -49,6 +49,12 @@ def convert_to_base(x, base):
     f = np.vectorize(_convert_to_base)
     return f(x, base)
 
+def print_main_column(base):
+    x = [i for i in range(base, base**2)]
+    x = convert_to_base(x, base)
+    for s in x:
+        print(s)
+
 # N is the number of desired digits for s. If the number of digits of s is less
 # than N, then this function appends as many '0' in the beginning as needed. If
 # the number of digits of s is more than N, then this function just returns s

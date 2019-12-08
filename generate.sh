@@ -31,5 +31,39 @@ x = sanitize_numeric_string(x, $n)
 print_table(x, $base)
 EOF
 )
-	echo $str | tr -d "\n" | sed -f $sanitize
+	str=$(echo $str | tr -d "\n" | sed -f $sanitize)
+
+	if [[ "$mode" == "interpolations" ]]; then
+		str=$(echo $str | sed "s/\$0\$ \& //1")
+	fi
+
+	echo $str
+}
+
+# args: base
+function print_main_column
+{
+	base=$1
+	python <<EOF
+from $(basename $logarithms_script .py) import *
+print_main_column($base)
+EOF
+}
+
+# Merge the log table and interpolation tables into one
+# args: base
+function generate_latex_table
+{
+	base=$1
+	logarithms=$(generate logarithms $base)
+	interpolations=$(generate interpolations $base)
+	main=$(print_main_column $base)
+	n=$(echo $logarithms | wc -l)
+	for i in {1..$n}; do
+		# get the i-th lines
+		L=$(echo $logarithms | sed "${i}q;d")
+		I=$(echo $interpolations | sed "${i}q;d")
+		M=$(echo $main | sed "${i}q;d")
+		echo $M \& $L \& $I '\\\\'
+	done
 }
