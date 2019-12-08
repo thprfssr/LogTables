@@ -59,11 +59,35 @@ function generate_latex_table
 	interpolations=$(generate interpolations $base)
 	main=$(print_main_column $base)
 	n=$(echo $logarithms | wc -l)
+	echo '\\begin{tabular}'
+	printf '{| c | '
+	printf 'c %.0s' {1..$base}
+	printf '| '
+	printf 'c %.0s' {2..$base}
+	printf "|}\n"
+	echo '\\hline'
 	for i in {1..$n}; do
 		# get the i-th lines
 		L=$(echo $logarithms | sed "${i}q;d")
 		I=$(echo $interpolations | sed "${i}q;d")
 		M=$(echo $main | sed "${i}q;d")
-		echo $M \& $L \& $I '\\\\'
+		echo '\t'$M \& $L \& $I '\\\\'
+		if (( $i % $base == 0 )); then
+			echo '\\hline'
+		fi
 	done
+	echo '\\end{tabular}'
+}
+
+# args: base
+function generate_latex_document
+{
+	cat <<EOF
+\\documentclass{standalone}
+\\begin{document}
+
+$(generate_latex_table $base)
+
+\end{document}
+EOF
 }
