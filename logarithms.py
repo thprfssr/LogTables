@@ -16,8 +16,12 @@ def get_interpolation(base):
     diff = [np.log(i + 1) - np.log(i) for i in range(base, base**2)]
     diff /= np.log(base)
     diff *= base**2
-    diff = np.round(diff)
-    return diff.astype(int)
+    interpolations = []
+    for d in diff:
+        for i in range(0, base):
+            interpolations.append(d * i)
+    interpolations = np.round(interpolations)
+    return interpolations.astype(int)
 
 def print_table(table, base):
     for i in range(0, len(table) // base):
