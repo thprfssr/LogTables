@@ -82,6 +82,7 @@ function generate_latex_table
 # args: base
 function generate_latex_document
 {
+	base=$1
 	cat <<EOF
 \\documentclass{standalone}
 \\begin{document}
