@@ -165,8 +165,9 @@ function get_tabular_body
 }
 
 # This function fills out a template for a LaTeX tabular object in order to make
-# a log or antilog table. The output of this function can be put in LaTeX's
-# tabular environment.
+# a log or antilog table. The output of this function is a fully fledged tabular
+# object, which can then be put into its own standalone document, or it can be
+# put within a `table` environment.
 #
 # NOTE: This function does not check whether the passed arguments fall within
 # their allowed ranges.
