@@ -129,6 +129,40 @@ function get_table_spec
 	fi
 }
 
+# Fill out the main body of the LaTeX tabular object with the input column
+# (which contains the number whose logarithm or antilogarithm is taken), the
+# principal columns (either logarithms or antilogarithms), and the interpolation
+# columns.
+#
+# NOTE: This function does not check whether the given arguments fall within
+# their allowed ranges.
+#
+# args: mode base
+# mode: 'log' or 'antilog'
+# base: integer strictly greater than 1
+function get_tabular_body
+{
+	mode=$1
+	base=$2
+
+	principals=$(generate $mode $base principal)
+	interpolations=$(generate $mode $base interpolation)
+	main=$(print_main_column $mode $base)
+	n=$(echo $main | wc -l)
+
+	for i in {1..$n}; do
+		# get the i-th lines
+		L=$(echo $principals | sed "${i}q;d")
+		I=$(echo $interpolations | sed "${i}q;d")
+		M=$(echo $main | sed "${i}q;d")
+
+		echo "\t\$$M\$ & $L & $I" '\\\\'
+		if (( $i % $base == 0 )); then
+			echo "\\hline"
+		fi
+	done
+}
+
 # This function generates a fully-formatted LaTeX tabular object.
 #
 # NOTE: This function does not check whether the passed arguments fall within
@@ -142,11 +176,6 @@ function generate_latex_table
 	mode=$1
 	base=$2
 
-	principals=$(generate $mode $base principal)
-	interpolations=$(generate $mode $base interpolation)
-	main=$(print_main_column $mode $base)
-	n=$(echo $main | wc -l)
-
 	echo '\\begin{tabular}'
 	get_table_spec $base
 	echo '\\hline'
@@ -154,16 +183,7 @@ function generate_latex_table
 	echo '\\hline'
 	echo "~ & $(generate digits $base) & $(generate digits $base | cut -d' ' -f3-)" '\\\\'
 	echo "\\hline"
-	for i in {1..$n}; do
-		# get the i-th lines
-		L=$(echo $principals | sed "${i}q;d")
-		I=$(echo $interpolations | sed "${i}q;d")
-		M=$(echo $main | sed "${i}q;d")
-		echo '\t'\$$M\$ \& $L \& $I '\\\\'
-		if (( $i % $base == 0 )); then
-			echo '\\hline'
-		fi
-	done
+	get_tabular_body $mode $base
 	echo '\\end{tabular}'
 }
 
