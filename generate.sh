@@ -55,7 +55,10 @@ function print_main_column_log
 	base=$1
 	python <<EOF
 from $(basename $logarithms_script .py) import *
-print_main_column($base)
+x = [i for i in range($base, $base**2)]
+x = convert_to_base(x, $base)
+for s in x:
+    print(s)
 EOF
 }
 
