@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 logarithms_script='logarithms.py'
 sanitize='sanitize.sed'
@@ -101,3 +101,5 @@ $(generate_latex_table $base)
 \end{document}
 EOF
 }
+
+generate_latex_document $1
