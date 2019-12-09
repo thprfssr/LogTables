@@ -1,0 +1,11 @@
+\begin{tabular}
+	%TABLE_SPEC%
+	\hline
+	\multicolumn{%MULTICOLUMN%}{|c|}{%TITLE%} \\
+	\hline
+	~ & %PRINCIPAL_DIGITS% & %INTERPOLATION_DIGITS% \\
+	\hline
+	%CONTENTS%
+	~ & %PRINCIPAL_DIGITS% & %INTERPOLATION_DIGITS% \\
+	\hline
+\end{tabular}
