@@ -3,33 +3,49 @@
 logarithms_script='logarithms.py'
 sanitize='sanitize.sed'
 
-# If the mode is "logarithm", then the function prints the columns of
-# logarithms. If the mode is "interpolation", then the function prints the
-# columns of the mean differences. Otherwise, the program dies.
-# args: mode, base
-# mode: "logarithm", "interpolation"
+
+# This function makes all the necessary calculations to generate log and antilog
+# tables. The purpose of this function is to print the columns of the table,
+# formatted for LaTeX's tabular environment. This means that each column is
+# separated by the '&' character, and each column entry is enclosed between two
+# matching '$' characters.
+#
+# Disclaimer: It is not the task of this function to generate a fully-formatted
+# LaTeX table.
+#
+# For the sake of code brevity, this function accepts three variables: mode,
+# base, and part. The base must be an integer strictly greater than 1. The mode
+# can be either 'log', 'antilog', or 'digits'.
+#
+# If the mode is 'log' or 'antilog', then the function takes a look at the value
+# at the variable called part. The part can be either 'principal' or
+# 'interpolation'. This tells the function whether to print the principal
+# columns of the table (i.e. the ones containing the logarithms or
+# antilogarithms), or to print the columns containing the interpolations.
+#
+# It the mode variable is set to 'digits', then the function prints all the
+# digits for the given base. In this case, the part variable is ignored.
+#
+# NOTE: This function does not check if mode, base, and part are all within
+# their allowed ranges.
+#
+# args: mode base part
+# mode: 'log' or 'antilog'
+# base: integer strictly greater than 1
+# part: 'principal' or 'interpolation'
 function generate
 {
 	mode=$1
 	base=$2
-	if [[ "$mode" == "logarithms" ]]; then
-		func=get_log
-		n=4
-	elif [[ "$mode" == "antilogarithms" ]]; then
-		func=get_antilog
-		n=4
-	elif [[ "$mode" == "log_interpolations" ]]; then
-		func=get_log_interpolation
-		n=1
-	elif [[ "$mode" == "antilog_interpolations" ]]; then
-		func=get_antilog_interpolation
-		n=1
-	elif [[ "$mode" == "digits" ]]; then
+	part=$3
+	n=1 # This is the default number of desired digits for each entry to have
+	if [[ "$mode" == "digits" ]]; then
 		func=get_digits
-		n=1
-	else
-		echo Unrecognized mode \"$mode\". Exiting...
-		exit -1
+	elif [[ "$part" == "principal" ]]; then
+		func=get_$mode
+		n=4 # Notice that n is changed in this case
+	elif [[ "$part" == "interpolation" ]]; then
+		func=get_${mode}_interpolation
 	fi
 
 	str=$(python <<EOF
@@ -40,27 +56,41 @@ x = sanitize_numeric_string(x, $n)
 print_table(x, $base)
 EOF
 )
+	# We run the raw output of the Python script through a sed script which
+	# formats it for LaTeX's tabular environment.
 	str=$(echo $str | tr -d "\n" | sed -f $sanitize)
 
-	if [[ "$mode" == "log_interpolations" ]]; then
+	# If the part variable is set to 'interpolation', then the first column
+	# is all zeroes, so we delete it.
+	if [[ "$part" == "interpolation" ]]; then
 		str=$(echo $str | sed "s/\$0\$ \& //1")
 	fi
 
 	echo $str
 }
 
-# args: mode, base
+# This function prints a newline-separated list of integers from base to base^2,
+# if the mode is 'log', or from 0 to base^2, if the mode is 'antilog'.
+#
+# NOTE: The output of this function is not wrapped around '$' characters for
+# LaTeX's math mode. This must be done by whoever calls the function.
+# NOTE: This function does not check that the given arguments fall within their
+# allowed ranges.
+#
+# args: mode base
+# mode: 'log' or 'antilog'
+# base: integer strictly greater than 1
 function print_main_column
 {
 	mode=$1
 	base=$2
-	if [[ "$mode" == "logarithms" ]]; then
+	if [[ "$mode" == "log" ]]; then
 		lower_limit=$base
-	elif [[ "$mode" == "antilogarithms" ]]; then
+	elif [[ "$mode" == "antilog" ]]; then
 		lower_limit=0
 	else
 		echo "Unrecognized mode $mode. Exiting..."
-		exit
+		exit -1
 	fi
 	python <<EOF
 from $(basename $logarithms_script .py) import *
@@ -71,15 +101,24 @@ for s in x:
 EOF
 }
 
-# Merge the log table and interpolation tables into one
-# args: base
+# This function generates a fully-formatted LaTeX tabular object.
+#
+# NOTE: This function does not check whether the passed arguments fall within
+# their allowed ranges.
+#
+# args: mode base
+# mode: 'log' or 'antilog'
+# base: positive integer strictly greater than 1
 function generate_latex_table
 {
-	base=$1
-	logarithms=$(generate logarithms $base)
-	interpolations=$(generate log_interpolations $base)
-	main=$(print_main_column_log $base)
-	n=$(echo $logarithms | wc -l)
+	mode=$1
+	base=$2
+
+	principals=$(generate $mode $base principal)
+	interpolations=$(generate $mode $base interpolation)
+	main=$(print_main_column $mode $base)
+	n=$(echo $main | wc -l)
+
 	echo '\\begin{tabular}'
 	printf '{| c | '
 	printf 'c %.0s' {1..$base}
@@ -93,7 +132,7 @@ function generate_latex_table
 	echo "\\hline"
 	for i in {1..$n}; do
 		# get the i-th lines
-		L=$(echo $logarithms | sed "${i}q;d")
+		L=$(echo $principals | sed "${i}q;d")
 		I=$(echo $interpolations | sed "${i}q;d")
 		M=$(echo $main | sed "${i}q;d")
 		echo '\t'\$$M\$ \& $L \& $I '\\\\'
@@ -104,17 +143,26 @@ function generate_latex_table
 	echo '\\end{tabular}'
 }
 
-# args: base
+# This function generates a complete LaTeX document which can be compiled.
+#
+# NOTE: This function does not check whether the given arguments fall within
+# their allowed ranges.
+#
+# args: mode base
+# mode: 'log' or 'antilog'
+# base: integer strictly greater than 1
 function generate_latex_document
 {
-	base=$1
+	mode=$1
+	base=$2
+
 	cat <<EOF
 \\documentclass[border=1pt]{standalone}
 \\usepackage{multirow}
 \\everymath{\\mathtt{\\xdef\\tmp{\\fam\\the\\fam\\relax}\\aftergroup\\tmp}}
 \\begin{document}
 
-$(generate_latex_table $base)
+$(generate_latex_table $mode $base)
 
 \end{document}
 EOF
