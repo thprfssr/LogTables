@@ -71,7 +71,9 @@ def convert_to_base(x, base):
     f = np.vectorize(_convert_to_base)
     return f(x, base)
 
-def get_main_row(base):
+# This function returns an array of all the integers from 0 to the base. It's
+# defined because it's called from an external script.
+def get_digits(base):
     x = [i for i in range(0, base)]
     return x
 

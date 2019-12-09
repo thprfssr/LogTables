@@ -25,7 +25,7 @@ function generate
 		func=get_antilog_interpolation
 		n=1
 	elif [[ "$mode" == "digits" ]]; then
-		func=get_main_row
+		func=get_digits
 		n=1
 	else
 		echo Unrecognized mode \"$mode\". Exiting...
