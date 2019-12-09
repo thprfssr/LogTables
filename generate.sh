@@ -101,6 +101,34 @@ for s in x:
 EOF
 }
 
+# Get the 'table spec' option for the LaTeX tabular environment.
+# 
+# NOTE: This function does not check whether the given arguments fall within
+# their allowed ranges.
+#
+# args: base
+# base: integer strictly greater than 1
+function get_table_spec
+{
+	if (( $base == 6 )); then
+		echo '{|c|ccc|ccc||ccccc|}'
+	elif (( $base == 8 )); then
+		echo '{|c|cccc|cccc||cc|ccc|cc|}'
+	elif (( $base == 10 )); then
+		echo '{|c|ccccc|ccccc||ccc|ccc|ccc|}'
+	elif (( $base == 12 )); then
+		echo '{|c|cccc|cccc|cccc||cccc|ccc|cccc|}'
+	elif (( $base == 16 )); then
+		echo '{|c|cccc|cccc|cccc|cccc||ccccc|ccccc|ccccc|}'
+	else
+		printf "{|c|"
+		printf "c%.0s" {1..$base}
+		printf "||"
+		printf "c%.0s" {2..$base}
+		printf "|}\n"
+	fi
+}
+
 # This function generates a fully-formatted LaTeX tabular object.
 #
 # NOTE: This function does not check whether the passed arguments fall within
@@ -120,11 +148,7 @@ function generate_latex_table
 	n=$(echo $main | wc -l)
 
 	echo '\\begin{tabular}'
-	printf '{| c | '
-	printf 'c %.0s' {1..$base}
-	printf '|| '
-	printf 'c %.0s' {2..$base}
-	printf "|}\n"
+	get_table_spec $base
 	echo '\\hline'
 	echo "\\multicolumn{$((2 * $base))}{|c|}{Base $base Logarithms}" '\\\\'
 	echo '\\hline'
