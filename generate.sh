@@ -2,6 +2,7 @@
 
 logarithms_script='logarithms.py'
 sanitize='sanitize.sed'
+tabular_template=tabular.latex.template
 
 
 # This function makes all the necessary calculations to generate log and antilog
@@ -163,7 +164,9 @@ function get_tabular_body
 	done
 }
 
-# This function generates a fully-formatted LaTeX tabular object.
+# This function fills out a template for a LaTeX tabular object in order to make
+# a log or antilog table. The output of this function can be put in LaTeX's
+# tabular environment.
 #
 # NOTE: This function does not check whether the passed arguments fall within
 # their allowed ranges.
@@ -176,15 +179,34 @@ function generate_latex_table
 	mode=$1
 	base=$2
 
-	echo '\\begin{tabular}'
-	get_table_spec $base
-	echo '\\hline'
-	echo "\\multicolumn{$((2 * $base))}{|c|}{Base $base Logarithms}" '\\\\'
-	echo '\\hline'
-	echo "~ & $(generate digits $base) & $(generate digits $base | cut -d' ' -f3-)" '\\\\'
-	echo "\\hline"
-	get_tabular_body $mode $base
-	echo '\\end{tabular}'
+	if [[ "$mode" == "log" ]]; then
+		title="Base $base logarithms"
+	elif [[ "$mode" == "antilog" ]]; then
+		title="Base $base antilogarithms"
+	fi
+	
+	str="$(cat $tabular_template)"
+	table_spec="$(get_table_spec $base)"
+	multicolumn="$((2 * base))"
+	principal_digits="$(generate digits $base)"
+	interpolation_digits="$(echo $principal_digits | cut -d ' ' -f3-)"
+	contents="$(get_tabular_body $mode $base)"
+
+	# We pass it through a pipe because the heredoc by itself messes up the
+	# double slashes at the end of each line.
+	perl <<EOF | perl -p -e 's/\\\n/\\\\\n/g'
+my \$str = '$str';
+my @X = ("%TABLE_SPEC%", "%MULTICOLUMN%", "%TITLE%", "%PRINCIPAL_DIGITS%",
+"%INTERPOLATION_DIGITS%", "%CONTENTS%");
+my @Y = ('$table_spec', '$multicolumn', '$title', '$principal_digits',
+'$interpolation_digits', '$contents');
+my \$N = @X;
+
+for (my \$i = 0; \$i < \$N; \$i++) {
+	\$str =~ s/\$X[\$i]/\$Y[\$i]/g;
+}
+print \$str;
+EOF
 }
 
 # This function generates a complete LaTeX document which can be compiled.
