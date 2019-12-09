@@ -34,6 +34,17 @@ def get_log_interpolation(base):
     interpolations = np.round(interpolations)
     return interpolations.astype(int)
 
+def get_antilog_interpolation(base):
+    diff = [base**((i + 1) / base**2) - base**(i / base**2) for i in range(0, base**2)]
+    diff = np.array(diff)
+    diff *= base
+    interpolations = []
+    for d in diff:
+        for i in range(0, base):
+            interpolations.append(d * i)
+    interpolations = np.round(interpolations)
+    return interpolations.astype(int)
+
 def print_table(table, base):
     for i in range(0, len(table) // base):
         j = base * i
