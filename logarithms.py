@@ -5,10 +5,21 @@ def get_log_input(base):
     x = [i / base**2 for i in range(base**2, base**3)]
     return np.array(x)
 
+def get_antilog_input(base):
+    x = [i / base**3 for i in range(0, base**3)]
+    return np.array(x)
+
 def get_log(base):
     x = get_log_input(base)
     y = np.log(x) / np.log(base)
     y *= base**4
+    y = np.round(y)
+    return y.astype(int)
+
+def get_antilog(base):
+    x = get_antilog_input(base)
+    y = base**x
+    y *= base**3
     y = np.round(y)
     return y.astype(int)
 
