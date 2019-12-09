@@ -23,7 +23,7 @@ def get_antilog(base):
     y = np.round(y)
     return y.astype(int)
 
-def get_interpolation(base):
+def get_log_interpolation(base):
     diff = [np.log(i + 1) - np.log(i) for i in range(base, base**2)]
     diff /= np.log(base)
     diff *= base**2
