@@ -49,13 +49,22 @@ EOF
 	echo $str
 }
 
-# args: base
-function print_main_column_log
+# args: mode, base
+function print_main_column
 {
-	base=$1
+	mode=$1
+	base=$2
+	if [[ "$mode" == "logarithms" ]]; then
+		lower_limit=$base
+	elif [[ "$mode" == "antilogarithms" ]]; then
+		lower_limit=0
+	else
+		echo "Unrecognized mode $mode. Exiting..."
+		exit
+	fi
 	python <<EOF
 from $(basename $logarithms_script .py) import *
-x = [i for i in range($base, $base**2)]
+x = [i for i in range($lower_limit, $base**2)]
 x = convert_to_base(x, $base)
 for s in x:
     print(s)
@@ -111,4 +120,4 @@ $(generate_latex_table $base)
 EOF
 }
 
-generate_latex_document $1
+#generate_latex_document $1
