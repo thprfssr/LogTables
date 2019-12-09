@@ -15,8 +15,8 @@ function generate
 	if [[ "$mode" == "logarithms" ]]; then
 		func=get_log
 		n=4
-	elif [[ "$mode" == "interpolations" ]]; then
-		func=get_interpolation
+	elif [[ "$mode" == "log_interpolations" ]]; then
+		func=get_log_interpolation
 		n=1
 	elif [[ "$mode" == "digits" ]]; then
 		func=get_main_row
@@ -36,7 +36,7 @@ EOF
 )
 	str=$(echo $str | tr -d "\n" | sed -f $sanitize)
 
-	if [[ "$mode" == "interpolations" ]]; then
+	if [[ "$mode" == "log_interpolations" ]]; then
 		str=$(echo $str | sed "s/\$0\$ \& //1")
 	fi
 
@@ -59,7 +59,7 @@ function generate_latex_table
 {
 	base=$1
 	logarithms=$(generate logarithms $base)
-	interpolations=$(generate interpolations $base)
+	interpolations=$(generate log_interpolations $base)
 	main=$(print_main_column $base)
 	n=$(echo $logarithms | wc -l)
 	echo '\\begin{tabular}'
