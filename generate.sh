@@ -190,6 +190,9 @@ function generate_latex_table
 	table_spec="$(get_table_spec $base)"
 	multicolumn="$((2 * base))"
 	principal_digits="$(generate digits $base)"
+	# We pass this through cut in order to cut out the first two words,
+	# "$0$" and "&", because the interpolation digits only require the
+	# digits starting from 1, not from 0.
 	interpolation_digits="$(echo $principal_digits | cut -d ' ' -f3-)"
 	contents="$(get_tabular_body $mode $base)"
 
