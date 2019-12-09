@@ -22,7 +22,7 @@ function generate
 		func=get_log_interpolation
 		n=1
 	elif [[ "$mode" == "antilog_interpolations" ]]; then
-		func=get_antilog_interpolations
+		func=get_antilog_interpolation
 		n=1
 	elif [[ "$mode" == "digits" ]]; then
 		func=get_main_row
