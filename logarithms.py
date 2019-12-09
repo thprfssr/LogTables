@@ -71,12 +71,6 @@ def convert_to_base(x, base):
     f = np.vectorize(_convert_to_base)
     return f(x, base)
 
-def print_main_column(base):
-    x = [i for i in range(base, base**2)]
-    x = convert_to_base(x, base)
-    for s in x:
-        print(s)
-
 def get_main_row(base):
     x = [i for i in range(0, base)]
     return x
