@@ -15,8 +15,14 @@ function generate
 	if [[ "$mode" == "logarithms" ]]; then
 		func=get_log
 		n=4
+	elif [[ "$mode" == "antilogarithms" ]]; then
+		func=get_antilog
+		n=4
 	elif [[ "$mode" == "log_interpolations" ]]; then
 		func=get_log_interpolation
+		n=1
+	elif [[ "$mode" == "antilog_interpolations" ]]; then
+		func=get_antilog_interpolations
 		n=1
 	elif [[ "$mode" == "digits" ]]; then
 		func=get_main_row
