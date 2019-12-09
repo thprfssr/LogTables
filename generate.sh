@@ -50,7 +50,7 @@ EOF
 }
 
 # args: base
-function print_main_column
+function print_main_column_log
 {
 	base=$1
 	python <<EOF
@@ -66,7 +66,7 @@ function generate_latex_table
 	base=$1
 	logarithms=$(generate logarithms $base)
 	interpolations=$(generate log_interpolations $base)
-	main=$(print_main_column $base)
+	main=$(print_main_column_log $base)
 	n=$(echo $logarithms | wc -l)
 	echo '\\begin{tabular}'
 	printf '{| c | '
